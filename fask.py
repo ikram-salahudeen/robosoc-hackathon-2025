@@ -1,6 +1,17 @@
 from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+
+import distance
 
 app = Flask(__name__, template_folder="web")
+
+@socketio.on("my_event")
+def poll():
+    for x in range(5):
+        distance_data = distance.get_distances()
+
+        emit('server', {"distance1":1, "distance2":2}, room=sid)
+        socketio.sleep(1)
 
 @app.route('/')
 def home():
