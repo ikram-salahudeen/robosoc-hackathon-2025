@@ -1,9 +1,9 @@
-setInterval(() => {
-    fetch("/")
-        .then(response => response.text())
-        .then(html => {
-            let parser = new DOMParser();
-            let doc = parser.parseFromString(html, 'text/html');
-            document.getElementById("dynamic").innerText = doc.getElementById("dynamic").innerText;
-        });
-}, 2000);
+var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
+
+// Request to start stream
+socket.emit('start_stream');
+
+// Receive frames from server
+socket.on('video_frame', function(data) {
+        document.getElementById('video_feed').src = 'data:image/jpeg;base64,' + data.image;
+});

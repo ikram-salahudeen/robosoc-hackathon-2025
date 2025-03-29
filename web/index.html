@@ -90,7 +90,7 @@
             <button type="submit" name="command" value="stop">🛑</button>
             <button type="submit" name="command" value="right" >➡</button>
         </form>
-        <img src="{{ url_for('video_feed') }}" width="640" height="480">
+        <img id="video_feed" width="640" height="480">
         <p class="status">Status: Waiting for command...</p>
         <div class="sensor-readings">
             <p>Motor Duty: <span id="motor-duty">0%</span></p>
