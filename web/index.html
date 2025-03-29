@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h2 {
+            color: #2e7d32;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .square {
+            width: 350px;
+            height: 350px;
+            background-color: lightgray;
+            margin: 10px auto;
+            border-radius: 5px;
+        }
+        .status {
+            font-size: 14px;
+            color: #555;
+        }
+        .sensor-readings {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+            text-align: left;
+        }
+        .sensor-bar {
+            width: 100%;
+            height: 5px;
+            background: lightgray;
+            border-radius: 2px;
+            margin-top: 5px;
+            position: relative;
+        }
+        .sensor-bar::before {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: #2e7d32;
+            border-radius: 2px;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+    <script>
+
+      
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Robosoc Hackathon 2025</h2>
+        <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+        <form action="/control" method="post" target="dummyframe">
+            <button type="submit" name="command" value="left">⬅</button>
+            <button type="submit" name="command" value="stop">🛑</button>
+            <button type="submit" name="command" value="right" >➡</button>
+        </form>
+        <div class="square"></div>
+        <p class="status">Status: Waiting for command...</p>
+        <div class="sensor-readings">
+            <p>Motor Duty: <span id="motor-duty">0%</span></p>
+            <div class="sensor-bar"></div>
+            <p>Motor Direction: <span id="motor-direction">Stopped</span></p>
+            <div class="sensor-bar"></div>
+            <p>Distance Sensor: <span id="distance-sensor">N/A</span></p>
+            <div class="sensor-bar"></div>
+            <p>Slouch Factor: <span id="slouch-factor">N/A</span></p>
+            <div class="sensor-bar"></div>
+        </div>
+        <div class="footer">
+            <p>Designed by people.</p>
+        </div>
+    </div>
+</body>
+</html>
