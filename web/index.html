@@ -80,10 +80,6 @@
             text-align: center;
         }
     </style>
-    <script>
-
-      
-    </script>
 </head>
 <body>
     <div class="container">
@@ -94,7 +90,7 @@
             <button type="submit" name="command" value="stop">🛑</button>
             <button type="submit" name="command" value="right" >➡</button>
         </form>
-        <div class="square"></div>
+        <img src="{{ url_for('video_feed') }}" width="640" height="480">
         <p class="status">Status: Waiting for command...</p>
         <div class="sensor-readings">
             <p>Motor Duty: <span id="motor-duty">0%</span></p>
@@ -110,5 +106,6 @@
             <p>Designed by people.</p>
         </div>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

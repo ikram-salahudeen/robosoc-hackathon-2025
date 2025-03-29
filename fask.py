@@ -7,24 +7,21 @@ def home():
    return render_template('index.html')
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8500)
+
+@app.route('/control', methods=['POST'])
+def control():
+    command = request.form.get('command')
     
+    if command == "left":
+        print("left")
+    elif command == "right":
+        print("right")
+    elif command == "stop":
+        print("stop")
+    
+    return "", 204  # No content response
 
 """
-@app.route('/left', methods=['POST'])
-def left():
-    print("left")
-    return "left", 200
-
-@app.route('/right', methods=['POST'])
-def right():
-    print("right")
-    return "right", 200
-
-@app.route('/stop', methods=['POST'])
-def stop():
-    print("stop")
-    return "stop", 200
-
 def update_text():
     global dynamic_text
     while True:
