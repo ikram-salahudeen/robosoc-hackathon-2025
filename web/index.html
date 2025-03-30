@@ -21,7 +21,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 90%;
-    max-width: 400px;
+    max-width: 640px;
 }
 h2 {
     color: #2e7d32;
@@ -65,10 +65,18 @@ button:hover {
     margin-top: 5px;
     position: relative;
 }
+
+#bar1::before {
+    width: var(--bar1val);
+}
+
+#bar2::before {
+    width: 10; 
+}
+
 .sensor-bar::before {
     content: '';
     position: absolute;
-    width: 50%;
     height: 100%;
     background: #2e7d32;
     border-radius: 2px;
@@ -83,43 +91,9 @@ button:hover {
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 </head>
-<script>
-
-
-        var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
-        console.log("hi");
-
-        function updateStatus() {
-            document.querySelector("#status").innerHTML = "Last packet recieved " + new Date().toLocaleTimeString("it-IT");
-        }
-        
-        // Recieved message ( a string to be printed )
-        socket.on('message', function(data) {
-            updateStatus();
-            console.log("Message from server (", new Date().toLocaleTimeString("it-IT"), ") ",data.value);
-        });
-
-        // Recieved data ( put the sensor values in the html )
-        socket.on('data', function(data) {
-            //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
-
-            updateStatus();
-            document.querySelector("#motor-duty").innerHTML = data.duty;
-            document.querySelector("#motor-direction").innerHTML = data.dir;
-            document.querySelector("#distance-sensor").innerHTML = data.distance;
-            document.querySelector("#slouch-factor").innerHTML = data.slouch;
-        });
-
-        // Let's keep asking for data ervery 0.5s
-        setInterval(function() {
-            socket.emit('request_data');
-        }, 500);
-
-
-    </script>
 <body>
     <div class="container">
-        <h2>Robosoc Hackatshon 2025</h2>
+        <h2>Robosoc Hackathon 2025</h2>
         <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
         <form action="/control" method="post" target="dummyframe">
             <button type="submit" name="command" value="left">⬅</button>
@@ -127,25 +101,107 @@ button:hover {
             <button type="submit" name="command" value="right" >➡</button>
         </form>
         <img id="video_feed" width="640" height="480">
-        <p id="status">Status: Waiting for command...</p>
         <div class="sensor-readings">
-            <p class="counter">0</p>
-            <div class="sensor-bar"></div>
-            <p>Motor Duty: <span id="motor-duty">0%</span></p>
-            <div class="sensor-bar"></div>
-            <p>Motor Direction: <span id="motor-direction">Stopped</span></p>
-            <div class="sensor-bar"></div>
-            <p>Distance Sensor: <span id="distance-sensor">N/A</span></p>
-            <div class="sensor-bar"></div>
-            <p>Slouch Factor: <span id="slouch-factor">N/A</span></p>
-            <div class="sensor-bar"></div>
+            <p id="status">Status: Waiting for command...</p>
+            <p>Latest Command: <span id="command">Nothing<span></p>
+                <div class="slidecontainer">
+                    <input type="range" min="0" max="100" value="0.5" class="slider" id="duty" style="width:100%;">
+                  </div>
+            <p>Distance Sensor 1: <span id="sensor1">N/A</span></p>
+            <p>Distance Sensor 2: <span id="sensor2">N/A</span></p>
+            <div>People Detected:<span id="people-list">0</span></div>
+            <div class="detected-objects" id="detections-list">Objects Detected:</div>
         </div>
         <div class="footer">
             <p>Designed by people.</p>
             
         </div>
     </div>
-    <script src="script.js"></script>
+    
+<script>
+
+
+    var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
+    console.log("hi");
+
+    function updateStatus() {
+        document.querySelector("#status").innerHTML = "Last packet recieved " + new Date().toLocaleTimeString("it-IT");
+    }
+    
+    // Recieved message ( a string to be printed )
+    socket.on('message', function(data) {
+        updateStatus();
+        console.log("Message from server (", new Date().toLocaleTimeString("it-IT"), ") ",data.value);
+        console.log("Received counter value:", data.counter);
+        //document.querySelector('.counter').textContent = data.counter;
+        //document.querySelector('#command').textContent = data.command;
+    });
+
+    // Recieved data ( put the sensor values in the html )
+    socket.on('data', function(data) {
+        //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
+
+        updateStatus();
+        //document.querySelector("#motor-direction").innerHTML = data.dir;
+        document.querySelector("#sensor1").innerHTML = Math.round(data.distance1);
+        document.querySelector("#sensor2").innerHTML = Math.round(data.distance2);
+        //document.querySelector("#slouch-factor").innerHTML = data.slouch;
+    });
+
+    socket.on('image_update', function (data) {
+    const imgElement = document.getElementById("video_feed");
+    if (data.image) {
+            imgElement.src = "data:image/jpeg;base64," + data.image;
+        }
+    });
+
+    socket.on('detections', function(data) {
+        const detectedObjects = data.detections;  // Expecting an array of objects and scores
+        const detectionsList = document.getElementById('detections-list');
+		const peopleListSpan = document.getElementById('people-list');  // Get the span where the count is displayed
+    
+
+        console.log(detectedObjects)
+		
+		let personCount = 0;
+        
+        // Clear any previous list content
+        detectionsList.innerHTML = 'Objects Detected:';
+
+        // Add each object and score as a list item
+        detectedObjects.forEach((item) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${item[0]}: ${item[1]}`;  // Format the score to two decimal places
+            detectionsList.appendChild(listItem);
+			if (item.name.toLowerCase() === "person") {
+				personCount++;
+			}
+			peopleListSpan.textContent = personCount;
+        });
+    });
+
+    document.querySelector("#duty").addEventListener('input', function () {
+        console.log(document.querySelector("#duty").value)
+        var duty = document.querySelector("#duty").value;
+
+        if (duty > 100) {
+            duty = 1;
+        }
+        if (duty < 0) {
+            duty = 0;
+        }
+
+        socket.emit("set_duty",duty/ 100);
+    }, false);
+
+
+    // Let's keep asking for data ervery 0.5s
+    setInterval(function() {
+        socket.emit('request_data');
+    }, 100);
+
+
+</script>
     
 </body>
 </html>
