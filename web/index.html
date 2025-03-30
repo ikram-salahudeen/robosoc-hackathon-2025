@@ -83,40 +83,6 @@ button:hover {
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 </head>
-<script>
-
-
-        var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
-        console.log("hi");
-
-        function updateStatus() {
-            document.querySelector("#status").innerHTML = "Last packet recieved " + new Date().toLocaleTimeString("it-IT");
-        }
-        
-        // Recieved message ( a string to be printed )
-        socket.on('message', function(data) {
-            updateStatus();
-            console.log("Message from server (", new Date().toLocaleTimeString("it-IT"), ") ",data.value);
-        });
-
-        // Recieved data ( put the sensor values in the html )
-        socket.on('data', function(data) {
-            //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
-
-            updateStatus();
-            document.querySelector("#motor-duty").innerHTML = data.duty;
-            document.querySelector("#motor-direction").innerHTML = data.dir;
-            document.querySelector("#distance-sensor").innerHTML = data.distance;
-            document.querySelector("#slouch-factor").innerHTML = data.slouch;
-        });
-
-        // Let's keep asking for data ervery 0.5s
-        setInterval(function() {
-            socket.emit('request_data');
-        }, 500);
-
-
-    </script>
 <body>
     <div class="container">
         <h2>Robosoc Hackatshon 2025</h2>
@@ -127,10 +93,10 @@ button:hover {
             <button type="submit" name="command" value="right" >➡</button>
         </form>
         <img id="video_feed" width="640" height="480">
-        <p id="status">Status: Waiting for command...</p>
         <div class="sensor-readings">
+            <p id="status">Status: Waiting for command...</p>
+            <p>Latest Command: <span id="command">Nothing<span></p>
             <p class="counter">0</p>
-            <div class="sensor-bar"></div>
             <p>Motor Duty: <span id="motor-duty">0%</span></p>
             <div class="sensor-bar"></div>
             <p>Motor Direction: <span id="motor-direction">Stopped</span></p>
@@ -145,7 +111,44 @@ button:hover {
             
         </div>
     </div>
-    <script src="script.js"></script>
+    
+<script>
+
+
+    var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
+    console.log("hi");
+
+    function updateStatus() {
+        document.querySelector("#status").innerHTML = "Last packet recieved " + new Date().toLocaleTimeString("it-IT");
+    }
+    
+    // Recieved message ( a string to be printed )
+    socket.on('message', function(data) {
+        updateStatus();
+        console.log("Message from server (", new Date().toLocaleTimeString("it-IT"), ") ",data.value);
+        console.log("Received counter value:", data.counter);
+        document.querySelector('.counter').textContent = data.counter;
+        document.querySelector('#command').textContent = data.command;
+    });
+
+    // Recieved data ( put the sensor values in the html )
+    socket.on('data', function(data) {
+        //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
+
+        updateStatus();
+        document.querySelector("#motor-duty").innerHTML = data.duty;
+        document.querySelector("#motor-direction").innerHTML = data.dir;
+        document.querySelector("#distance-sensor").innerHTML = data.distance;
+        document.querySelector("#slouch-factor").innerHTML = data.slouch;
+    });
+
+    // Let's keep asking for data ervery 0.5s
+    setInterval(function() {
+        socket.emit('request_data');
+    }, 500);
+
+
+</script>
     
 </body>
 </html>

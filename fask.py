@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__, template_folder="web")
 socketio = SocketIO(app, async_handlers=True)  # Enable WebSocket support
 
+counter = 0
 
 @app.route('/')
 def home():
@@ -26,19 +27,22 @@ def poll():
 # The HTML form sends this (works)
 @app.route('/control', methods=['POST'])
 def control():
+    global counter
     command = request.form.get('command')
     
     if command == "left":
         print("left")
-        socketio.emit('message', {'value': 'Recieved left'})
+        counter -= 1
+        socketio.emit('message', {'value': 'Recieved left','counter': str(counter), 'command': 'Left'})
 
     elif command == "right":
         print("right")
-        socketio.emit('message', {'value': 'Recieved right'})
+        counter += 1
+        socketio.emit('message', {'value': 'Recieved right','counter': str(counter), 'command': 'Right'})        
 
     elif command == "stop":
         print("stop")
-        socketio.emit('message', {'value': 'Recieved stop'})
+        socketio.emit('message', {'value': 'Recieved stop', 'command': 'Stop'})
     
     return "", 204  # No content response, just to acknowledge the request
 
