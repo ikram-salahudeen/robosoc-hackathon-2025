@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request  
 from flask_socketio import SocketIO, emit
 import time
 import threading
+=======
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+
+import distance
+>>>>>>> 2ba300acf2914ea429f92d82d918209a62bb93b2
 
 app = Flask(__name__, template_folder="web")
 socketio = SocketIO(app, async_handlers=True)  # Enable WebSocket support
@@ -14,6 +21,14 @@ def increment_counter():
         socketio.sleep(1)  # Non-blocking sleep that yields control back to the event loop
         counter += 1
         socketio.emit('update_counter', {'value': counter})
+
+@socketio.on("my_event")
+def poll():
+    for x in range(5):
+        distance_data = distance.get_distances()
+
+        emit('server', {"distance1":1, "distance2":2}, room=sid)
+        socketio.sleep(1)
 
 @app.route('/')
 def home():
