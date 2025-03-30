@@ -123,6 +123,8 @@ button:hover {
 
     var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
     console.log("hi");
+    var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
+    console.log("hi");
 
     function updateStatus() {
         document.querySelector("#status").innerHTML = "Last packet recieved " + new Date().toLocaleTimeString("it-IT");
@@ -137,6 +139,9 @@ button:hover {
         //document.querySelector('#command').textContent = data.command;
     });
 
+    // Recieved data ( put the sensor values in the html )
+    socket.on('data', function(data) {
+        //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
     // Recieved data ( put the sensor values in the html )
     socket.on('data', function(data) {
         //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
@@ -201,6 +206,7 @@ button:hover {
     }, 100);
 
 
+</script>
 </script>
     
 </body>
