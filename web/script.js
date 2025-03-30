@@ -1,9 +1,7 @@
 var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
 
-// Request to start stream
-socket.emit('start_stream');
-
-// Receive frames from server
-socket.on('video_frame', function(data) {
-        document.getElementById('video_feed').src = 'data:image/jpeg;base64,' + data.image;
+// Listen for the server's response (no event name needed with `send`)
+socket.on('message', function(data) {
+    console.log("Received counter value:", data.value);
+    document.querySelector('.counter').textContent = data.value;
 });
