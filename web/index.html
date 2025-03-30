@@ -5,13 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Train Control</title>
     <style>
-        
+        body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+.container {
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+h2 {
+    color: #2e7d32;
+}
+button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+button:hover {
+    background-color: #388e3c;
+}
+.square {
+    width: 350px;
+    height: 350px;
+    background-color: lightgray;
+    margin: 10px auto;
+    border-radius: 5px;
+}
+.status {
+    font-size: 14px;
+    color: #555;
+}
+.sensor-readings {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+}
+.sensor-bar {
+    width: 100%;
+    height: 5px;
+    background: lightgray;
+    border-radius: 2px;
+    margin-top: 5px;
+    position: relative;
+}
+.sensor-bar::before {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: #2e7d32;
+    border-radius: 2px;
+}
+.footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #777;
+    text-align: center;
+}
     </style>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 </head>
+<script>
+
+
+        var socket = io.connect('http://' + window.location.hostname + ':' + location.port);
+        console.log("hi");
+
+        function updateStatus() {
+            document.querySelector("#status").innerHTML = "Last packet recieved " + new Date().toLocaleTimeString("it-IT");
+        }
+        
+        // Recieved message ( a string to be printed )
+        socket.on('message', function(data) {
+            updateStatus();
+            console.log("Message from server (", new Date().toLocaleTimeString("it-IT"), ") ",data.value);
+        });
+
+        // Recieved data ( put the sensor values in the html )
+        socket.on('data', function(data) {
+            //emit('data', {'test_number':842, 'duty':0.5, 'dir':'Left', 'distance': 3.333, 'slouch': 1.2})
+
+            updateStatus();
+            document.querySelector("#motor-duty").innerHTML = data.duty;
+            document.querySelector("#motor-direction").innerHTML = data.dir;
+            document.querySelector("#distance-sensor").innerHTML = data.distance;
+            document.querySelector("#slouch-factor").innerHTML = data.slouch;
+        });
+
+        // Let's keep asking for data ervery 0.5s
+        setInterval(function() {
+            socket.emit('request_data');
+        }, 500);
+
+
+    </script>
 <body>
     <div class="container">
-        <h2>Robosoc Hackathon 2025</h2>
+        <h2>Robosoc Hackatshon 2025</h2>
         <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
         <form action="/control" method="post" target="dummyframe">
             <button type="submit" name="command" value="left">⬅</button>
@@ -19,7 +127,7 @@
             <button type="submit" name="command" value="right" >➡</button>
         </form>
         <img id="video_feed" width="640" height="480">
-        <p class="status">Status: Waiting for command...</p>
+        <p id="status">Status: Waiting for command...</p>
         <div class="sensor-readings">
             <p class="counter">0</p>
             <div class="sensor-bar"></div>
@@ -34,8 +142,10 @@
         </div>
         <div class="footer">
             <p>Designed by people.</p>
+            
         </div>
     </div>
     <script src="script.js"></script>
+    
 </body>
 </html>
